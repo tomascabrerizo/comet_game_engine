@@ -10,6 +10,8 @@
 #include "base/event.h"
 #include "base/event.c"
 
+static b8 global_running;
+
 int main(void)
 {
     CmtPlatformState platform = {0};
@@ -46,10 +48,34 @@ int main(void)
     printf("8 bytes align: %llx\n", (u64)u64_align);
 
     cmt_print_memory_registry();
-
-    for(;;)
+    
+    global_running = true;
+    while(global_running)
     {
         cmt_platform_pump_events(&platform);
+        CmtEvent event;
+        while(cmt_event_get(&event))
+        {
+            switch(event.type)
+            {
+                case CMT_QUIT_EVENT:
+                {
+                    printf("key quit event!\n");
+                    global_running = false;
+                }break;
+                case CMT_KEYDOWN_EVENT:
+                {
+                    printf("'%c' key down event!\n", event.key.keycode);
+                }break;
+                case CMT_KEYUP_EVENT:
+                {
+                }break;
+                case CMT_TEST_EVENT:
+                {
+                    printf("test event!\n");
+                }break;
+            }
+        }
     }
     cmt_platform_destroy(&platform);
     

@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <stdlib.h>
 #include "platform/platform.h"
+#include "base/event.h"
 
 typedef struct Win32PlatformState
 {
@@ -21,8 +22,18 @@ static LRESULT win32_window_proc(HWND window, UINT message, WPARAM w_param, LPAR
         }break;
         case WM_CLOSE:
         {
+            CmtEvent event = {0};
+            event.type = CMT_QUIT_EVENT;
+            event.quit.state = true;
+            cmt_event_push(event);
         }break;
         case WM_KEYDOWN:
+        {
+            CmtEvent event = {0};
+            event.type = CMT_KEYDOWN_EVENT;
+            event.key.keycode = (u8)w_param;
+            cmt_event_push(event);
+        }break;
         case WM_KEYUP:
         {
         }
