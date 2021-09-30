@@ -7,6 +7,8 @@
 #endif
 #include "base/memory.h"
 #include "base/memory.c"
+#include "base/event.h"
+#include "base/event.c"
 
 int main(void)
 {
