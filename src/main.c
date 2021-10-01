@@ -10,6 +10,9 @@
 #include "base/event.h"
 #include "base/event.c"
 
+// TODO: remove opengl code form the user code
+#include "platform/opengl/glad/glad.h"
+
 static b8 global_running;
 
 int main(void)
@@ -20,32 +23,13 @@ int main(void)
     CmtLinearAllocator allocator = {0};
     cmt_linear_allocator_create(&allocator, MB(64));
     
-    u32 *u32_array = cmt_linear_alloc(&allocator, sizeof(u32)*10, 4);
-    u64 *u64_array = cmt_linear_alloc(&allocator, sizeof(u64)*10, 8);
-    
-    for(i32 i = 0; i < 10; ++i)
-    {
-        u32_array[i] = i;
-    }
-    for(i32 i = 0; i < 10; ++i)
-    {
-        u64_array[i] = 10 - i;
-    }
-    printf("------u32-array------\n");
-    for(i32 i = 0; i < 10; ++i)
-    {
-        printf("%d\n", u32_array[i]);
-    }
-    printf("------u64-array------\n");
-    for(i32 i = 0; i < 10; ++i)
-    {
-        printf("%lld\n", u64_array[i]);
-    }
-
     u32 *u32_align = cmt_linear_alloc(&allocator, sizeof(u32), 4);
     u64 *u64_align = cmt_linear_alloc(&allocator, sizeof(u64), 8);
     printf("4 bytes align: %llx\n", (u64)u32_align);
     printf("8 bytes align: %llx\n", (u64)u64_align);
+    
+    CmtFile file = cmt_platform_read_file(&allocator, "src/main.c");
+    (void)file;
 
     cmt_print_memory_registry();
     
@@ -76,6 +60,8 @@ int main(void)
                 }break;
             }
         }
+
+        cmt_platform_swap_buffers(&platform);
     }
     cmt_platform_destroy(&platform);
     

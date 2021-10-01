@@ -49,6 +49,8 @@ void cmt_linear_allocator_create(CmtLinearAllocator *allocator, u64 size)
     allocator->mem = cmt_alloc(size, MEM_LINEAR);
     allocator->used = 0;
     allocator->size = size;
+    allocator->alloc = cmt_linear_alloc;
+    allocator->clear = cmt_linear_clear;
 }
 
 void cmt_linear_allocator_destroy(CmtLinearAllocator *allocator)

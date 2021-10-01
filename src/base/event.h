@@ -11,19 +11,19 @@ typedef enum CmtEventType
     CMT_KEYUP_EVENT,
 } CmtEventType;
 
-#define CMT_CREATE_EVENT(name, ...) typedef struct name { CmtEventType type; __VA_ARGS__ } name;
+#define CMT_CREATE_EVENT(name, ...) typedef struct name { CmtEventType type; __VA_ARGS__ } name
 CMT_CREATE_EVENT(CmtTestEvent,
     u8 state0;
     u8 state1;
     u8 state2;
-)
+);
 CMT_CREATE_EVENT(CmtQuitEvent,
     b8 state;
-)
+);
 CMT_CREATE_EVENT(CmtKeyEvent,
     u8 keycode;
     b8 state;
-)
+);
 
 typedef union CmtEvent
 {

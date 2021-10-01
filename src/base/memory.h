@@ -22,11 +22,18 @@ void cmt_print_memory_registry();
 COMET void *cmt_alloc(u64 size, CmtMemoryTag tag);
 COMET void cmt_free(void *mem, u64 size, CmtMemoryTag tag);
 
+struct CmtLinearAllocator;
+typedef void *(*FpCmtAlloc)(struct CmtLinearAllocator *allocator, u64 size, u64 align);
+typedef void (*FpCmtClear)(struct CmtLinearAllocator *allocator);
 typedef struct CmtLinearAllocator
 {
     void *mem;
     u64 size;
     u64 used;
+
+    FpCmtAlloc alloc;
+    FpCmtClear clear;
+
 } CmtLinearAllocator;
 
 COMET void cmt_linear_allocator_create(CmtLinearAllocator *allocator, u64 size);

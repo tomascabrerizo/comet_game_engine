@@ -2,7 +2,13 @@
 
 #include <Windows.h>
 #include <stdlib.h>
+#include <stdio.h>
+
 #include "platform/platform.h"
+#include "platform/opengl/context.h"
+#include "platform/opengl/context_win32.c"
+
+#include "base/base.h"
 #include "base/event.h"
 
 typedef struct Win32PlatformState
@@ -19,6 +25,9 @@ static LRESULT win32_window_proc(HWND window, UINT message, WPARAM w_param, LPAR
     {
         case WM_CREATE:
         {
+            HDC device_context = GetDC(window);
+            cmt_platform_renderer_create((void *)&device_context);
+            ReleaseDC(window, device_context);
         }break;
         case WM_CLOSE:
         {
@@ -93,6 +102,12 @@ void cmt_platform_destroy(CmtPlatformState *platform)
     state->window = 0;
 }
 
+void cmt_platform_swap_buffers(CmtPlatformState* platform)
+{
+    Win32PlatformState *state = (Win32PlatformState *)platform->state;
+    SwapBuffers(state->device_context);
+}
+
 void *cmt_platform_allocate(u64 size)
 {
     // TODO: Use VirtualAlloc
@@ -105,6 +120,27 @@ void cmt_platform_release(void *mem, u64 size)
     // TODO: Use VirtualFree
     (void)size;
     free(mem);
+}
+
+CmtFile cmt_platform_read_file(CmtLinearAllocator *allocator, char *path)
+{
+    // TODO: use win32 IO functions 
+    CmtFile result = {0};
+    FILE *file = fopen(path, "r");
+    if(file)
+    {
+        fseek(file, 0, SEEK_END);
+        result.size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+        result.data = allocator->alloc(allocator, result.size, 0);
+        fread(result.data, 1, result.size, file);
+    }
+    else
+    {
+        printf("error opening file: '%s'\n", path);
+    }
+    fclose(file);
+    return result;
 }
 
 #endif
