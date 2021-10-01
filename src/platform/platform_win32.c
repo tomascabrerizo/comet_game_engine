@@ -122,7 +122,7 @@ void cmt_platform_release(void *mem, u64 size)
     free(mem);
 }
 
-CmtFile cmt_platform_read_file(CmtLinearAllocator *allocator, char *path)
+CmtFile cmt_platform_read_file(CmtAllocator *allocator, char *path)
 {
     // TODO: use win32 IO functions 
     CmtFile result = {0};

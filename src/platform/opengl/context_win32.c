@@ -59,7 +59,7 @@ void cmt_platform_renderer_create(void *data)
     {
         printf("Error: cannot create opengl context\n");
     }
-
+    printf("OpenGL version supported by this platform (%s)\n", glGetString(GL_VERSION));
 }
 
 #endif // PLATFORM_WIN32

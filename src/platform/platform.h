@@ -23,6 +23,6 @@ typedef struct CmtFile
     u64 size;
 } CmtFile;
 
-CmtFile cmt_platform_read_file(CmtLinearAllocator *allocator, char *path);
+CmtFile cmt_platform_read_file(CmtAllocator *allocator, char *path);
 
 #endif // PLATFORM_H

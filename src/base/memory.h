@@ -22,10 +22,12 @@ void cmt_print_memory_registry();
 COMET void *cmt_alloc(u64 size, CmtMemoryTag tag);
 COMET void cmt_free(void *mem, u64 size, CmtMemoryTag tag);
 
-struct CmtLinearAllocator;
-typedef void *(*FpCmtAlloc)(struct CmtLinearAllocator *allocator, u64 size, u64 align);
-typedef void (*FpCmtClear)(struct CmtLinearAllocator *allocator);
-typedef struct CmtLinearAllocator
+struct CmtAllocator;
+typedef void *(*FpCmtAlloc)(struct CmtAllocator *allocator, u64 size, u64 align);
+typedef void (*FpCmtFree)(struct CmtAllocator *allocator, u64 size, u64 align);
+typedef void (*FpCmtClear)(struct CmtAllocator *allocator);
+
+typedef struct CmtAllocator
 {
     void *mem;
     u64 size;
@@ -33,13 +35,15 @@ typedef struct CmtLinearAllocator
 
     FpCmtAlloc alloc;
     FpCmtClear clear;
+    FpCmtFree free;
 
-} CmtLinearAllocator;
+} CmtAllocator;
 
-COMET void cmt_linear_allocator_create(CmtLinearAllocator *allocator, u64 size);
-COMET void cmt_linear_allocator_destroy(CmtLinearAllocator *allocator);
+COMET void cmt_linear_allocator_create(CmtAllocator *allocator, u64 size);
+COMET void cmt_linear_allocator_destroy(CmtAllocator *allocator);
 
-COMET void *cmt_linear_alloc(CmtLinearAllocator *allocator, u64 size, u64 align);
-COMET void cmt_linear_clear(CmtLinearAllocator *allocator);
+void *cmt_linear_alloc(CmtAllocator *allocator, u64 size, u64 align);
+void cmt_linear_free(CmtAllocator *allocator, u64 size, u64 align);
+void cmt_linear_clear(CmtAllocator *allocator);
 
 #endif // MEMORY_H

@@ -41,7 +41,7 @@ void cmt_free(void *mem, u64 size, CmtMemoryTag tag)
     mem = 0;
 }
 
-void cmt_linear_allocator_create(CmtLinearAllocator *allocator, u64 size)
+void cmt_linear_allocator_create(CmtAllocator *allocator, u64 size)
 {
     // TODO: dont assert, report and error insted
     ASSERT(allocator);
@@ -51,9 +51,10 @@ void cmt_linear_allocator_create(CmtLinearAllocator *allocator, u64 size)
     allocator->size = size;
     allocator->alloc = cmt_linear_alloc;
     allocator->clear = cmt_linear_clear;
+    allocator->free = cmt_linear_free;
 }
 
-void cmt_linear_allocator_destroy(CmtLinearAllocator *allocator)
+void cmt_linear_allocator_destroy(CmtAllocator *allocator)
 {
     // TODO: dont assert, report and error insted
     ASSERT(allocator);
@@ -61,7 +62,7 @@ void cmt_linear_allocator_destroy(CmtLinearAllocator *allocator)
     allocator->size = 0;
 }
 
-void *cmt_linear_alloc(CmtLinearAllocator *allocator, u64 size, u64 align)
+void *cmt_linear_alloc(CmtAllocator *allocator, u64 size, u64 align)
 {
     // NOTE: must be a power of two
     ASSERT((align & (align - 1)) == 0);
@@ -76,7 +77,12 @@ void *cmt_linear_alloc(CmtLinearAllocator *allocator, u64 size, u64 align)
     return result;
 }
 
-void cmt_linear_clear(CmtLinearAllocator *allocator)
+void cmt_linear_free(CmtAllocator *allocator, u64 size, u64 align)
+{
+    ASSERT(!"Error: linears allocator cannot free memory\n");
+}
+
+void cmt_linear_clear(CmtAllocator *allocator)
 {
     allocator->used = 0;
 }
