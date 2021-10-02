@@ -73,11 +73,18 @@ void cmt_platform_create(CmtPlatformState *platform, char *app_name, u32 x, u32 
     // TODO: Check for errors
     RegisterClassA(&window_class);
     
+    RECT window_rect = {0};
+    window_rect.bottom = height;
+    window_rect.right = widht;
+    AdjustWindowRect(&window_rect, WS_VISIBLE|WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU, 0);
+
+    u32 window_width = window_rect.right - window_rect.left;
+    u32 window_height = window_rect.bottom - window_rect.top;
     state->window = CreateWindowExA(0, window_class.lpszClassName, app_name,
                                     WS_VISIBLE|WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU,
-                                    x, y, widht, height,
+                                    x, y, window_width, window_height,
                                     0, 0, state->h_instance, 0);
-    
+
     // TODO: Check for error
     state->device_context = GetDC(state->window);
 }
