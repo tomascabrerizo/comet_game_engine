@@ -1,6 +1,4 @@
 #include "renderer/renderer.h"
-
-#include "platform/platform.h"
 #include "platform/opengl/glad/glad.h"
 
 typedef struct CmtShader
@@ -19,7 +17,6 @@ typedef struct CmtOpenglRendererState
     u32 vao;
     CmtShader shaders[CMT_MAX_NUM_SHADERS]; 
     u32 shaders_count;
-
     CmtVertexBuffer vertex_buffer[CMT_MAX_NUM_BUFFERS]; 
     u32 vertex_buffer_count;
 

@@ -25,9 +25,6 @@ static LRESULT win32_window_proc(HWND window, UINT message, WPARAM w_param, LPAR
     {
         case WM_CREATE:
         {
-            HDC device_context = GetDC(window);
-            cmt_platform_renderer_create((void *)&device_context);
-            ReleaseDC(window, device_context);
         }break;
         case WM_CLOSE:
         {
@@ -71,22 +68,33 @@ void cmt_platform_create(CmtPlatformState *platform, char *app_name, u32 x, u32 
     window_class.lpszClassName = "comet_wndclass";
     
     // TODO: Check for errors
-    RegisterClassA(&window_class);
-    
-    RECT window_rect = {0};
-    window_rect.bottom = height;
-    window_rect.right = widht;
-    AdjustWindowRect(&window_rect, WS_VISIBLE|WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU, 0);
+    if(RegisterClassA(&window_class))
+    {
+        RECT window_rect = {0};
+        window_rect.bottom = height;
+        window_rect.right = widht;
+        AdjustWindowRect(&window_rect, WS_VISIBLE|WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU, 0);
 
-    u32 window_width = window_rect.right - window_rect.left;
-    u32 window_height = window_rect.bottom - window_rect.top;
-    state->window = CreateWindowExA(0, window_class.lpszClassName, app_name,
-                                    WS_VISIBLE|WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU,
-                                    x, y, window_width, window_height,
-                                    0, 0, state->h_instance, 0);
-
-    // TODO: Check for error
-    state->device_context = GetDC(state->window);
+        u32 window_width = window_rect.right - window_rect.left;
+        u32 window_height = window_rect.bottom - window_rect.top;
+        state->window = CreateWindowExA(0, window_class.lpszClassName, app_name,
+                                        WS_VISIBLE|WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU,
+                                        x, y, window_width, window_height,
+                                        0, 0, state->h_instance, 0);
+        if(state->window)
+        {
+            state->device_context = GetDC(state->window);
+            cmt_platform_renderer_create((void *)&state->device_context);
+        }
+        else
+        {
+            printf("error cannot create win32 window\n");
+        }
+    }
+    else
+    {
+        printf("error cannot register win32 window\n");
+    }
 }
 
 void cmt_platform_pump_events(CmtPlatformState* platform)

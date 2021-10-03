@@ -10,7 +10,7 @@
 
 void cmt_platform_renderer_create(void *data)
 {
-    HDC device_context = *((HDC *)data);
+    HDC *device_context = ((HDC *)data);
 
     PIXELFORMATDESCRIPTOR pixel_format = {};
     pixel_format.nSize = sizeof(pixel_format);
@@ -22,12 +22,11 @@ void cmt_platform_renderer_create(void *data)
     pixel_format.cStencilBits = 8;
     pixel_format.iLayerType = PFD_MAIN_PLANE;
 
-    int window_pixel_format = ChoosePixelFormat(device_context, &pixel_format);
-    SetPixelFormat(device_context, window_pixel_format, &pixel_format);
-
-    HGLRC temp_gl_context = wglCreateContext(device_context);
-    wglMakeCurrent(device_context, temp_gl_context);
+    int window_pixel_format = ChoosePixelFormat(*device_context, &pixel_format);
+    SetPixelFormat(*device_context, window_pixel_format, &pixel_format);
     
+    HGLRC temp_gl_context = wglCreateContext(*device_context);
+    wglMakeCurrent(*device_context, temp_gl_context);
     i32 attributes[] = 
     {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -40,10 +39,11 @@ void cmt_platform_renderer_create(void *data)
         (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
     if(wglCreateContextAttribsARB)
     {
-        HGLRC gl_context = wglCreateContextAttribsARB(device_context, 0, attributes);
-        wglMakeCurrent(0, 0);
+        HGLRC gl_context = wglCreateContextAttribsARB(*device_context, 0, attributes);
+        wglMakeCurrent(*device_context, 0);
         wglDeleteContext(temp_gl_context); // NOTE: delete temporal context
-        wglMakeCurrent(device_context, gl_context);
+        wglMakeCurrent(*device_context, gl_context);
+        
         PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = 
                     (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
         if(wglSwapIntervalEXT)

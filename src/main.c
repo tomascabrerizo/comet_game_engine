@@ -42,11 +42,10 @@ int main(void)
     CmtAllocator linear_allocator = {0};
     cmt_linear_allocator_create(&linear_allocator, MB(64));
     
-    u32 *u32_align = linear_allocator.alloc(&linear_allocator, sizeof(u32), 4);
     u64 *u64_align = linear_allocator.alloc(&linear_allocator, sizeof(u64), 8);
+    u32 *u32_align = linear_allocator.alloc(&linear_allocator, sizeof(u32), 4);
     printf("4 bytes align: %llx\n", (u64)u32_align);
     printf("8 bytes align: %llx\n", (u64)u64_align);
-    cmt_print_memory_registry();
     
     CmtRendererState renderer = {0};
     cmt_renderer_create(&linear_allocator, &renderer);
@@ -54,7 +53,6 @@ int main(void)
     CmtVertexBuffer *triangle_buffer = renderer.create_vertex_buffer(&renderer, vertices, sizeof(vertices));
     renderer.use_shader(&renderer, triangle_shader);
     renderer.use_vertex_buffer(&renderer, triangle_buffer);
-    
     global_running = true;
     while(global_running)
     {
@@ -72,6 +70,10 @@ int main(void)
                 case CMT_KEYDOWN_EVENT:
                 {
                     printf("'%c' key down event!\n", event.key.keycode);
+                    if(event.key.keycode == 'M')
+                    {
+                        cmt_print_memory_registry();
+                    }
                 }break;
                 case CMT_KEYUP_EVENT:
                 {
@@ -82,7 +84,6 @@ int main(void)
                 }break;
             }
         }
-
         renderer.begin(&renderer);
         renderer.end(&renderer);
         

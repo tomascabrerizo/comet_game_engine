@@ -26,8 +26,8 @@ typedef struct CmtRendererState
     void *state; 
 } CmtRendererState;
 
-void cmt_renderer_create(CmtAllocator *allocator, CmtRendererState *renderer);
-void cmt_renderer_destroy(CmtAllocator *allocator, CmtRendererState *renderer);
+COMET void cmt_renderer_create(CmtAllocator *allocator, CmtRendererState *renderer);
+COMET void cmt_renderer_destroy(CmtAllocator *allocator, CmtRendererState *renderer);
 
 void cmt_renderer_begin(CmtRendererState *renderer);
 void cmt_renderer_end(CmtRendererState *renderer);
