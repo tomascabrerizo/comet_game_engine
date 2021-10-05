@@ -79,7 +79,7 @@ void *cmt_linear_alloc(CmtAllocator *allocator, u64 size, u64 align)
 
 void cmt_linear_free(CmtAllocator *allocator, u64 size, u64 align)
 {
-    ASSERT(!"Error: linears allocator cannot free memory\n");
+    ASSERT(!"Error: linear allocators cannot free memory");
 }
 
 void cmt_linear_clear(CmtAllocator *allocator)

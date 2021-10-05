@@ -5,6 +5,8 @@
 #include "base/memory.c"
 #include "base/event.h"
 #include "base/event.c"
+#include "base/math.h"
+#include "base/math.c"
 
 #include "platform/platform.h"
 #include "platform/platform_win32.c"
@@ -36,6 +38,14 @@ char *triangle_frag_shader =
 
 int main(void)
 {
+    // NOTE: vector library test
+    v3 test = v3(3.4, 9, 40);
+    printf("v3 = (%f, %f, %f)\n", test.x, test.y, test.z);
+    printf("y = (%f)\n", VEC_INDEX(test, 1));
+    printf("x = (%f)\n", VEC_INDEX(test, 0));
+    printf("z = (%f)\n", VEC_INDEX(test, 2));
+
+
     CmtPlatformState platform = {0};
     cmt_platform_create(&platform, "Comet Game Engine", 100, 100, 800, 600);
     
@@ -89,6 +99,7 @@ int main(void)
         
         cmt_platform_swap_buffers(&platform);
     }
+    cmt_renderer_destroy(&linear_allocator, &renderer);
     cmt_platform_destroy(&platform);
     
     return 0;
