@@ -31,6 +31,14 @@ void cmt_renderer_create(CmtAllocator *allocator, CmtRendererState *renderer)
     renderer->use_shader = cmt_renderer_use_shader;
     renderer->create_vertex_buffer = cmt_renderer_create_vertex_buffer;
     renderer->use_vertex_buffer = cmt_renderer_use_vertex_buffer;
+    
+    renderer->set_uniform_f32 = cmt_renderer_set_uniform_f32;
+    renderer->set_uniform_i32 = cmt_renderer_set_uniform_i32;
+    renderer->set_uniform_v2 = cmt_renderer_set_uniform_v2; 
+    renderer->set_uniform_v3 = cmt_renderer_set_uniform_v3;
+    renderer->set_uniform_v4 = cmt_renderer_set_uniform_v4;
+    renderer->set_uniform_m4 = cmt_renderer_set_uniform_m4;
+
 
     // TODO: the renderer must be able to access the platform
     glViewport(0, 0, 800, 600);
@@ -45,7 +53,7 @@ void cmt_renderer_create(CmtAllocator *allocator, CmtRendererState *renderer)
 
 void cmt_renderer_destroy(CmtAllocator *allocator, CmtRendererState *renderer)
 {
-    // TODO: loop all renderers array and destroy all programs and buffers
+    // TODO: loop all renderer arrays and destroy all programs and buffers
 }
 
 void cmt_renderer_begin(CmtRendererState *renderer)
@@ -134,4 +142,35 @@ CmtVertexBuffer *cmt_renderer_create_vertex_buffer(CmtRendererState *renderer, v
 void cmt_renderer_use_vertex_buffer(CmtRendererState *renderer, struct CmtVertexBuffer *vertex_buffer)
 {
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer->buffer);
+}
+
+void cmt_renderer_set_uniform_f32(CmtShader *shader, char *name, f32 value)
+{
+    u32 location = glGetUniformLocation(shader->program, name);
+    glUniform1f(location, value);
+}
+void cmt_renderer_set_uniform_i32(CmtShader *shader, char *name, i32 value)
+{
+    u32 location = glGetUniformLocation(shader->program, name);
+    glUniform1i(location, value);
+}
+void cmt_renderer_set_uniform_v2(CmtShader *shader, char *name, v2 vec)
+{
+    u32 location = glGetUniformLocation(shader->program, name);
+    glUniform2f(location, vec.x, vec.y);
+}
+void cmt_renderer_set_uniform_v3(CmtShader *shader, char *name, v3 vec)
+{
+    u32 location = glGetUniformLocation(shader->program, name);
+    glUniform3f(location, vec.x, vec.y, vec.z);
+}
+void cmt_renderer_set_uniform_v4(CmtShader *shader, char *name, v4 vec)
+{
+    u32 location = glGetUniformLocation(shader->program, name);
+    glUniform4f(location, vec.x, vec.y, vec.z, vec.w);
+}
+void cmt_renderer_set_uniform_m4(CmtShader *shader, char *name, m4 mat)
+{
+    u32 location = glGetUniformLocation(shader->program, name);
+    glUniformMatrix4fv(location, 1, GL_FALSE, (f32 *)mat.m);
 }
