@@ -10,6 +10,7 @@ static char *cmt_tag_to_string(CmtMemoryTag tag)
         case MEM_UNKNOW: return "UNKNOW";
         case MEM_LINEAR: return "LINEAR";
         case MEM_STACK: return "STACK";
+        case MEM_POOL: return "POOL";
         case MEM_COUNT: 
         { 
             ASSERT(!"invalid code path MEM_COUNT cannot be string");
@@ -40,6 +41,8 @@ void cmt_free(void *mem, u64 size, CmtMemoryTag tag)
     cmt_platform_release(mem, size); 
     mem = 0;
 }
+
+// NOTE: linear allocator
 
 void cmt_linear_allocator_create(CmtAllocator *allocator, u64 size)
 {
@@ -77,7 +80,7 @@ void *cmt_linear_alloc(CmtAllocator *allocator, u64 size, u64 align)
     return result;
 }
 
-void cmt_linear_free(CmtAllocator *allocator, u64 size, u64 align)
+void cmt_linear_free(CmtAllocator *allocator, void *mem, u64 size, u64 align)
 {
     ASSERT(!"Error: linear allocators cannot free memory");
 }
@@ -85,4 +88,59 @@ void cmt_linear_free(CmtAllocator *allocator, u64 size, u64 align)
 void cmt_linear_clear(CmtAllocator *allocator)
 {
     allocator->used = 0;
+}
+
+// NOTE: pool allocator
+
+void cmt_pool_allocator_create(CmtAllocator *allocator, u64 block_size, u64 count)
+{
+    ASSERT(block_size >= sizeof(CmtMemBlock));
+    allocator->size = block_size * count;
+    allocator->used = 0;
+    allocator->mem = cmt_alloc(allocator->used, MEM_POOL);
+    // NOTE: initialize the list of free pools
+    allocator->block_size = block_size;
+    allocator->pool = (CmtMemBlock *)allocator->mem;
+    CmtMemBlock *block = allocator->pool;
+    for(i32 i = 0; i < count; ++i)
+    {
+        block->mem = (u8 *)allocator->mem + (i * block_size);
+        block->next = (CmtMemBlock *)((u8 *)block->mem + block_size);
+        block->mem = block->next;
+    }
+
+    // NOTE: set the allocator virtual table
+    allocator->alloc = cmt_pool_alloc;
+    allocator->clear = cmt_pool_clear;
+    allocator->free = cmt_pool_free;
+}
+
+void cmt_pool_allocator_destroy(CmtAllocator *allocator)
+{
+    cmt_free(allocator->mem, allocator->size, MEM_POOL);
+    allocator->size = 0;
+    allocator->used = 0;
+}
+
+void *cmt_pool_alloc(CmtAllocator *allocator, u64 size, u64 align)
+{
+    // NOTE: remove the first element of the pool list
+    ASSERT(allocator->pool);
+    CmtMemBlock *block = allocator->pool;
+    allocator->pool = allocator->pool->next;
+    return block->mem;
+}
+
+void cmt_pool_free(CmtAllocator *allocator, void *mem, u64 size, u64 align)
+{
+    // NOTE: add a new no to the top of the pool with the new free block 
+    CmtMemBlock *block = mem;
+    block->mem = mem;
+    block->next = allocator->pool;
+    allocator->pool = block;
+}
+
+void cmt_pool_clear(CmtAllocator *allocator)
+{
+    ASSERT(!"error: pool allocator clear not implemented");
 }

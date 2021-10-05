@@ -50,7 +50,7 @@ int main(void)
     CmtRendererState renderer = {0};
     cmt_renderer_create(&linear_allocator, &renderer);
     
-    // TODO: add markers to the linear allocator or something form temp memory like this files
+    // TODO: add markers to the linear allocator or something for temp memory like this files
     CmtFile test_vert = cmt_platform_read_file(&linear_allocator, "src/renderer/shader/test.vert");
     CmtFile test_frag = cmt_platform_read_file(&linear_allocator, "src/renderer/shader/test.frag");
     CmtShader *test_shader = renderer.load_shader(&renderer, test_vert.data, test_frag.data);
