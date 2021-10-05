@@ -45,7 +45,6 @@ int main(void)
     printf("x = (%f)\n", VEC_INDEX(test, 0));
     printf("z = (%f)\n", VEC_INDEX(test, 2));
 
-
     CmtPlatformState platform = {0};
     cmt_platform_create(&platform, "Comet Game Engine", 100, 100, 800, 600);
     
