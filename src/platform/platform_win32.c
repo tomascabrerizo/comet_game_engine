@@ -67,7 +67,6 @@ void cmt_platform_create(CmtPlatformState *platform, char *app_name, u32 x, u32 
     window_class.hInstance = state->h_instance;
     window_class.lpszClassName = "comet_wndclass";
     
-    // TODO: Check for errors
     if(RegisterClassA(&window_class))
     {
         RECT window_rect = {0};
@@ -83,6 +82,7 @@ void cmt_platform_create(CmtPlatformState *platform, char *app_name, u32 x, u32 
                                         0, 0, state->h_instance, 0);
         if(state->window)
         {
+            // TODO: move this code into WM_CREATE
             state->device_context = GetDC(state->window);
             cmt_platform_renderer_create((void *)&state->device_context);
         }

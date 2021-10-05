@@ -84,7 +84,7 @@ CmtShader *cmt_renderer_load_shader(CmtRendererState *renderer, char *vert, char
         GLsizei log_size = 0;
         char message[1024];
         glGetShaderInfoLog(v_shader, 1024, &log_size, message);
-        printf("Fail to compile vertex shader:'%s'", message);
+        printf("Fail to compile vertex shader:'%s'\n", message);
     }
 
     glCompileShader(f_shader);
@@ -95,7 +95,7 @@ CmtShader *cmt_renderer_load_shader(CmtRendererState *renderer, char *vert, char
         GLsizei log_size = 0;
         char message[1024];
         glGetShaderInfoLog(f_shader, 1024, &log_size, message);
-        printf("Fail to compile fragment shader:'%s'", message);
+        printf("Fail to compile fragment shader:'%s'\n", message);
     }
     
     ASSERT(state->shaders_count < CMT_MAX_NUM_SHADERS);
@@ -112,7 +112,7 @@ CmtShader *cmt_renderer_load_shader(CmtRendererState *renderer, char *vert, char
         GLsizei log_size = 0;
         char message[1024];
         glGetShaderInfoLog(shader->program, 1024, &log_size, message);
-        printf("Fail to link shader shader_program:'%s'", message);
+        printf("Fail to link shader shader_program:'%s'\n", message);
     }
     
     glDeleteShader(v_shader);
@@ -172,5 +172,5 @@ void cmt_renderer_set_uniform_v4(CmtShader *shader, char *name, v4 vec)
 void cmt_renderer_set_uniform_m4(CmtShader *shader, char *name, m4 mat)
 {
     u32 location = glGetUniformLocation(shader->program, name);
-    glUniformMatrix4fv(location, 1, GL_FALSE, (f32 *)mat.m);
+    glUniformMatrix4fv(location, 1, GL_TRUE, (f32 *)mat.m);
 }

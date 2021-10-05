@@ -16,25 +16,21 @@
 
 static b8 global_running;
 
+#if 1
+f32 vertices[6] =
+{
+    0.0f,    0.0f,
+    400.0f,  300.0f,
+    800.0f,  0.0f,
+};
+#else
 f32 vertices[6] =
 {
     -1.0f, -1.0f,
      1.0f, -1.0f,
      0.0f,  1.0f,
 };
-
-char *triangle_vert_shader = 
-    "#version 450 core\n"
-    "layout (location = 0) in vec2 pos;\n"
-    "void main() {\n"
-        "gl_Position = vec4(pos, 0, 1);\n"
-    "}\n";
-char *triangle_frag_shader = 
-    "#version 450 core\n"
-    "out vec4 color;\n"
-    "void main() {\n"
-        "color = vec4(0, 0, 1, 1);\n"
-    "}\n";
+#endif
 
 int main(void)
 {
@@ -51,17 +47,25 @@ int main(void)
     CmtAllocator linear_allocator = {0};
     cmt_linear_allocator_create(&linear_allocator, MB(64));
     
-    u64 *u64_align = linear_allocator.alloc(&linear_allocator, sizeof(u64), 8);
-    u32 *u32_align = linear_allocator.alloc(&linear_allocator, sizeof(u32), 4);
-    printf("4 bytes align: %llx\n", (u64)u32_align);
-    printf("8 bytes align: %llx\n", (u64)u64_align);
-    
     CmtRendererState renderer = {0};
     cmt_renderer_create(&linear_allocator, &renderer);
-    CmtShader *triangle_shader = renderer.load_shader(&renderer, triangle_vert_shader, triangle_frag_shader);
+    
+    // TODO: add markers to the linear allocator or something form temp memory like this files
+    CmtFile test_vert = cmt_platform_read_file(&linear_allocator, "src/renderer/shader/test.vert");
+    CmtFile test_frag = cmt_platform_read_file(&linear_allocator, "src/renderer/shader/test.frag");
+    CmtShader *test_shader = renderer.load_shader(&renderer, test_vert.data, test_frag.data);
+
     CmtVertexBuffer *triangle_buffer = renderer.create_vertex_buffer(&renderer, vertices, sizeof(vertices));
-    renderer.use_shader(&renderer, triangle_shader);
+    
+    renderer.use_shader(&renderer, test_shader);
     renderer.use_vertex_buffer(&renderer, triangle_buffer);
+#if 1
+    renderer.set_uniform_m4(test_shader, "projection", m4_orthographic(0, 800, 0, 600, 0, 100));
+#else
+    renderer.set_uniform_m4(test_shader, "model", m4_translate(v3(0, 0, 4)));
+    renderer.set_uniform_m4(test_shader, "projection", m4_perspective(60, 800/600, 0.1f, 100.0f));
+#endif
+
     global_running = true;
     while(global_running)
     {
