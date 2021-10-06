@@ -44,6 +44,12 @@ int main(void)
     CmtPlatformState platform = {0};
     cmt_platform_create(&platform, "Comet Game Engine", 100, 100, 800, 600);
     
+    // NOTE: pool allocator test
+    CmtAllocator pool_allocator = {0};
+    cmt_pool_allocator_create(&pool_allocator, 64, 5);
+    void *block = pool_allocator.alloc(&pool_allocator, 0, 0);
+    (void)block;
+
     CmtAllocator linear_allocator = {0};
     cmt_linear_allocator_create(&linear_allocator, MB(64));
     

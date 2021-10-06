@@ -105,8 +105,12 @@ void cmt_pool_allocator_create(CmtAllocator *allocator, u64 block_size, u64 coun
     for(i32 i = 0; i < count; ++i)
     {
         block->mem = (u8 *)allocator->mem + (i * block_size);
-        block->next = (CmtMemBlock *)((u8 *)block->mem + block_size);
-        block->mem = block->next;
+        // NOTE: last block dont have next
+        if(i < count-1)
+        {
+            block->next = (CmtMemBlock *)((u8 *)block->mem + block_size);
+        }
+        block = block->next;
     }
 
     // NOTE: set the allocator virtual table
@@ -120,6 +124,8 @@ void cmt_pool_allocator_destroy(CmtAllocator *allocator)
     cmt_free(allocator->mem, allocator->size, MEM_POOL);
     allocator->size = 0;
     allocator->used = 0;
+    allocator->pool = 0;
+    allocator->block_size = 0;
 }
 
 void *cmt_pool_alloc(CmtAllocator *allocator, u64 size, u64 align)
